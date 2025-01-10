@@ -112,7 +112,8 @@ def main():
             font-size: 0.875rem;
         }
         h1 {font-size: 3rem !important;  /* Adjust this value to increase the font size */
-        } h2, h3, h4, h5, h6 {
+        } h2 {font-size: 1.5rem !important;  /* Adjust this value to increase the font size */
+        h3, h4, h5, h6 {
             font-size: 80% !important;
         }
         p, li {
@@ -124,9 +125,15 @@ def main():
     # Header with smaller text
     st.markdown("""
         <h1 style='text-align: center; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.875rem;'>
-            Resume Enhancer
+            Resume Easz 
         </h1>
     """, unsafe_allow_html=True)
+    st.markdown("""
+        <h2 style='text-align: center; font-size: 1.5rem; font-weight: 400; margin-bottom: 0.875rem;'>
+            Analyze and Enhance Your Resume with AI 
+        </h2>
+    """, unsafe_allow_html=True)
+    
 
     # Centered flowchart toggle
     col_toggle, _, _ = st.columns([1, 1, 1])
