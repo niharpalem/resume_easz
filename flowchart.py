@@ -1,92 +1,83 @@
-import streamlit
 import graphviz
+import streamlit as st
 
 def display_architecture_diagram():
     # Create a directed graph
-    graph = graphviz.Digraph()
+    graph = graphviz.Digraph(format='png')
     
-    # Define common node styles
-    action_style = {'style': 'filled', 'fillcolor': '#90EE90'}
-    decision_style = {'shape': 'diamond', 'style': 'filled', 'fillcolor': '#87CEEB'}
-    process_style = {'shape': 'box', 'style': 'filled', 'fillcolor': '#DDA0DD'}
-    input_style = {'style': 'filled', 'fillcolor': '#FFA500'}
+    # Define node styles
+    styles = {
+        'start': {'shape': 'cylinder', 'style': 'filled', 'fillcolor': '#22c55e', 'fontcolor': 'white'},
+        'input': {'shape': 'box', 'style': 'filled', 'fillcolor': '#f97316', 'fontcolor': 'white'},
+        'decision': {'shape': 'diamond', 'style': 'filled', 'fillcolor': '#0ea5e9', 'fontcolor': 'white'},
+        'process': {'shape': 'box', 'style': 'filled', 'fillcolor': '#8b5cf6', 'fontcolor': 'white'},
+        'output': {'shape': 'box', 'style': 'filled', 'fillcolor': '#ec4899', 'fontcolor': 'white'}
+    }
+
+    # Add nodes
+    graph.node('Start', '🚀 Start\nApplication', **styles['start'])
+    graph.node('Upload', '📄 Upload DOCX\nResume', **styles['input'])
+    graph.node('JobDesc', '💼 Input Job\nDescription', **styles['input'])
+    graph.node('ApiKey', '🔑 Input GROQ\nAPI Key', **styles['input'])
+    graph.node('ChooseAction', '🔄 Choose\nAction', **styles['decision'])
+    graph.node('AnalysisType', '📊 Analysis\nType', **styles['decision'])
     
-    # Add nodes - Input Section
-    graph.node('Start Application', **action_style)
-    graph.node('Upload DOCX Resume', **action_style)
-    graph.node('Resume Uploaded?', **decision_style)
-    graph.node('Convert DOCX to Text', **input_style)
-    graph.node('Manual Text Input', **input_style)
-    graph.node('Input Job Description', **input_style)
-    graph.node('Input GROQ API Key', **input_style)
+    # Add process nodes with detailed content
+    quick_analysis = """Quick Analysis
+──────────────
+• Skills Match Rating
+• Experience Alignment
+• Pros and Cons
+• Match Percentage"""
+    graph.node('QuickAnalysis', quick_analysis, **styles['process'])
     
-    # Add decision nodes
-    graph.node('Choose Action', **decision_style)
-    graph.node('Analysis Type', **decision_style)
+    in_depth = """In-Depth Analysis
+──────────────
+• Comprehensive Skill Gap
+• Detailed Experience Review
+• Career Path Alignment
+• Strategic Recommendations"""
+    graph.node('InDepthAnalysis', in_depth, **styles['process'])
     
-    # Add process nodes with detailed descriptions
-    graph.node('Quick Analysis', '''Quick Analysis Flow:
-    - Skills Match Rating
-    - Experience Alignment
-    - Pros and Cons
-    - Match Percentage''', **process_style)
+    enhancement = """Resume Enhancement
+──────────────
+• In-Depth Analysis
+• Format Optimization
+• Content Improvement
+• Design Enhancement"""
+    graph.node('Enhancement', enhancement, **styles['process'])
     
-    graph.node('In-Depth Analysis', '''In-Depth Analysis Flow:
-    - Skill Gap Analysis
-    - Experience Analysis
-    - Optimization Tips
-    - Strategic Recommendations''', **process_style)
+    # Add output nodes
+    results = """Analysis Results
+──────────────
+📊 Analysis Summary
+📝 Recommendations
+✅ Action Items"""
+    graph.node('Results', results, **styles['output'])
     
-    graph.node('Enhancement Process', '''Enhancement Process:
-    - Run In-Depth Analysis
-    - Generate Improvements
-    - Format Content
-    - Create Multiple Formats''', **process_style)
-    
-    # Add output nodes with formats
-    graph.node('Display Results', '''Output Options:
-    - Analysis Results
-    - Recommendations
-    - Action Items''', **process_style)
-    
-    graph.node('Enhanced Resume Outputs', '''Available Formats:
-    - Plain Text
-    - Formatted HTML
-    - DOCX Download
-    - Side-by-Side Comparison
-    - Highlighted Changes''', **process_style)
-    
-    # Add edges - Basic Flow
-    graph.edge('Start Application', 'Upload DOCX Resume')
-    graph.edge('Upload DOCX Resume', 'Resume Uploaded?')
-    graph.edge('Resume Uploaded?', 'Convert DOCX to Text', 'Yes')
-    graph.edge('Resume Uploaded?', 'Manual Text Input', 'No')
-    
-    # Add edges - Input Processing
-    graph.edge('Convert DOCX to Text', 'Input Job Description')
-    graph.edge('Manual Text Input', 'Input Job Description')
-    graph.edge('Input Job Description', 'Input GROQ API Key')
-    graph.edge('Input GROQ API Key', 'Choose Action')
-    
-    # Add edges - Analysis Paths
-    graph.edge('Choose Action', 'Analysis Type', 'Analyze')
-    graph.edge('Choose Action', 'Enhancement Process', 'Enhance')
-    graph.edge('Analysis Type', 'Quick Analysis', 'Quick')
-    graph.edge('Analysis Type', 'In-Depth Analysis', 'In-Depth')
-    
-    # Add edges - Output Paths
-    graph.edge('Quick Analysis', 'Display Results')
-    graph.edge('In-Depth Analysis', 'Display Results')
-    graph.edge('Enhancement Process', 'Enhanced Resume Outputs')
-    
-    # Add optional paths
-    graph.edge('Display Results', 'Choose Action', 'Start New Analysis')
-    graph.edge('Enhanced Resume Outputs', 'Choose Action', 'Start New Analysis')
-    
-    # Configure graph attributes
-    graph.attr(rankdir='TB')
-    graph.attr(splines='ortho')
-    graph.attr(nodesep='0.5')
-    graph.attr(ranksep='0.5')
+    enhanced = """Enhanced Resume
+──────────────
+📑 Optimized DOCX
+🖍️ Text Highlighting Changes
+🌐 HTML Version"""
+    graph.node('EnhancedOutputs', enhanced, **styles['output'])
+
+    # Add edges
+    graph.edge('Start', 'Upload')
+    graph.edge('Upload', 'JobDesc')
+    graph.edge('JobDesc', 'ApiKey')
+    graph.edge('ApiKey', 'ChooseAction')
+    graph.edge('ChooseAction', 'AnalysisType', 'Analyze')
+    graph.edge('ChooseAction', 'Enhancement', 'Enhance')
+    graph.edge('AnalysisType', 'QuickAnalysis', 'Quick')
+    graph.edge('AnalysisType', 'InDepthAnalysis', 'In-Depth')
+    graph.edge('QuickAnalysis', 'Results')
+    graph.edge('InDepthAnalysis', 'Results')
+    graph.edge('Enhancement', 'EnhancedOutputs')
+    graph.edge('Results', 'ChooseAction', 'New Analysis')
+    graph.edge('EnhancedOutputs', 'ChooseAction', 'New Analysis')
+
+    # Graph settings
+    graph.attr(rankdir='TB', splines='ortho')
     
     return graph

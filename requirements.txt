@@ -5,3 +5,4 @@ docx2txt
 fpdf
 graphviz
 diff-match-patch
+pdf2image
