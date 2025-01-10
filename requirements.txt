@@ -1,0 +1,7 @@
+streamlit
+groq
+python-docx
+docx2txt
+fpdf
+graphviz
+diff-match-patch
