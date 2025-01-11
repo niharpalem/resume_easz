@@ -31,7 +31,7 @@ def display_architecture_diagram():
 • Match Percentage"""
     graph.node('QuickAnalysis', quick_analysis, **styles['process'])
     
-    in_depth = """In-Depth Analysis
+    in_depth = """In-Depth Analysisc
 ──────────────
 • Comprehensive Skill Gap
 • Detailed Experience Review

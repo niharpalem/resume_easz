@@ -224,18 +224,7 @@ def main():
                         ])
                         
                         with tab1:
-                            # Single HTML display with "Open in New Window" button
-                            st.markdown(
-                                f"""
-                                <a href="data:text/html,{formatted_html}" target="_blank">
-                                    <button style="background-color: #2563eb; color: white; padding: 0.5rem 1rem; 
-                                    border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
-                                        Open in New Window
-                                    </button>
-                                </a>
-                                """,
-                                unsafe_allow_html=True
-                            )
+                            # Single HTML component for the enhanced resume
                             st.components.v1.html(
                                 f"""
                                 <div class="resume-html">
