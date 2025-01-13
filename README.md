@@ -1,6 +1,9 @@
 # AI-Powered Resume Analyzer and Enhancer
-
 This application is an AI-powered tool that analyzes and enhances resumes based on job descriptions. It uses advanced language models to provide detailed insights and improvements for job seekers.
+
+
+
+<p align="center"> <img src="architecture.png" alt="Image generated using Claude AI"> <br> <em>Image generated using Claude AI</em> </p> 
 
 ## Features
 
@@ -44,7 +47,7 @@ The application follows this high-level flow:
 
 ## Usage
 
-1. Run the Streamlit app: `streamlit run app.py`
+1. Run the Streamlit app: `streamlit run main.py`
 2. Upload your resume (DOCX format)
 3. Enter the job description
 4. Provide your GROQ API key
@@ -53,7 +56,7 @@ The application follows this high-level flow:
 
 ## Modules
 
-- `app.py`: Main Streamlit application
+- `main.py`: Main Streamlit application
 - `prompts.py`: Prompts for handling resume parsing and formatting
 - `flowhchart.py`: Flow chart vizualization
 
