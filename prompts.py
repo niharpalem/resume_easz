@@ -107,35 +107,50 @@ def enhance_resume(_client, analysis, resume):
     )
     return response.choices[0].message.content
 
+
+
+
 def generate_formatted_resume_html(_client, enhanced_resume):
     prompt = f"""
-    Convert the following resume text into a professionally formatted HTML document.
-    Follow these requirements:
-    1. Use professional fonts and styling (use Google Fonts for better compatibility)
-    2. Create clear section headers with appropriate spacing
-    3. Format contact information prominently at the top
-    4. Use a clean, professional layout with proper margins
-    5. Make achievements and skills stand out
-    6. Ensure mobile responsiveness using media queries
-    7. Use a professional color scheme (suggest using navy, gray, and white)
-    8. Include print-friendly styling
-    9. Highlight any modifications from the original resume with appropriate styling
+    Convert the enhanced resume into a single-page HTML document optimized for ATS and human readability.
     
-    Structure the HTML with:
-    - Semantic HTML5 tags
-    - Responsive CSS using flexbox or grid
-    - Clean typography with proper hierarchy
-    - Professional spacing and alignment
-    - Bullet points for achievements and skills
-    - Proper section organization
-    - Visual indicators for modified content
+    **Content and Formatting Requirements**:
+    1. **Structure**:
+       - Use semantic HTML5 elements (e.g., <header>, <section>, <footer>) for clarity.
+       - Create a main container div with class "resume-container".
+       - Include distinct sections for:
+         - Contact Information (e.g., Name, Email, Phone, LinkedIn)
+         - Summary/Objective
+         - Professional Experience
+         - Projects (highlight tech stack, methodologies, and measurable achievements)
+         - Education
+         - Technical Skills
+       - Present projects and achievements in detail, including combined tech stack information for a polished look.
     
-    Resume Content: {enhanced_resume}
-    
-    Return a complete HTML document with embedded CSS in the <style> tag.
-    Include styles for highlighting modified content.
-    """
+    2. **CSS Styling**:
+       - Page width: 8.5in (US Letter).
+       - Margins: 0.5in on all sides.
+       - Font: Use professional, readable fonts (e.g., Arial, Helvetica, sans-serif).
+       - Font-size: 12px for body, 14-16px for headings.
+       - Line-height: 1.4-1.6 for readability.
+       - Apply a print media query to ensure the entire resume fits on one page when printed.
+       - Use subtle styling to differentiate sections (e.g., bold section titles, slight background shading for headers).
 
+    3. **Ensure Valid HTML**:
+       - Include the following exact elements:
+         1. <!DOCTYPE html>
+         2. <html lang="en">
+         3. <head> with:
+            - Character encoding meta tag
+            - Title tag
+            - Style tag for CSS
+         4. <body> with the structured resume content.
+    
+    Resume Content to Convert: {enhanced_resume}
+    
+    IMPORTANT: Provide a complete, valid HTML document. Ensure all sections are properly nested and visually appealing.
+    """
+    
     response = _client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="llama-3.3-70b-versatile",
