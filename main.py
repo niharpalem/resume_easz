@@ -11,15 +11,26 @@ from pdf2image import convert_from_path
 import io
 
 def update_docx(original_file, new_content):
+    """
+    Update the content of a docx file and return a BytesIO object with the updated file.
+    """
+    #to read the docx file
     doc = docx.Document(original_file)
+    #clears the content of the docx file
     doc._body.clear_content()
+    #adds the new content to the docx file
     doc.add_paragraph(new_content)
+    #creates a BytesIO object to store the updated docx file (for temporary storage)
     doc_io = BytesIO()
     doc.save(doc_io)
+    #moves the pointer back to start of the BytesIO object
     doc_io.seek(0)
     return doc_io
 
 def show_diff(text1, text2):
+    """
+    Show the differences between two texts side by side
+    """
     dmp = diff_match_patch()
     diffs = dmp.diff_main(text1, text2)
     dmp.diff_cleanupSemantic(diffs)
@@ -27,11 +38,15 @@ def show_diff(text1, text2):
     html = []
     for (op, data) in diffs:
         text = data.replace('\n', '<br>')
+        #0 for no change, 1 for insertion, -1 for deletion
         if op == 1:
+            #highlight the inserted text with green background
             html.append(f'<span style="background-color: #d1fae5">{text}</span>')
         elif op == -1:
+            #strike through the deleted text
             html.append(f'<span style="background-color: #fee2e2; text-decoration: line-through">{text}</span>')
         else:
+            #no change
             html.append(text)
             
     return ''.join(html)
@@ -136,6 +151,7 @@ def main():
         )
         
         if uploaded_file is not None:
+            # Convert the docx file to text
             resume_text = docx2txt.process(uploaded_file)
             original_file = uploaded_file
 
@@ -168,6 +184,7 @@ def main():
             process_deep = col_b2.button("In-Depth Analysis")
             process_enhance = col_b3.button("Enhance Resume")
 
+        #to check if any of the buttons are clicked
         if any([process_quick, process_deep, process_enhance]):
             if not resume_text:
                 st.error("Please upload your resume.")
