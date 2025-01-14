@@ -36,29 +36,6 @@ def show_diff(text1, text2):
             
     return ''.join(html)
 
-def convert_docx_to_pdf(docx_file):
-    # Convert DOCX to PDF
-    resume_text = docx2txt.process(docx_file)
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, resume_text)
-    
-    # Save PDF to a byte stream
-    pdf_output = io.BytesIO()
-    pdf.output(pdf_output)
-    pdf_output.seek(0)  # Rewind to the beginning of the file
-    return pdf_output
-
-def convert_pdf_to_png(pdf_file):
-    # Convert PDF to PNG using pdf2image
-    images = convert_from_path(pdf_file)
-    # Save the first page as PNG
-    png_output = io.BytesIO()
-    images[0].save(png_output, format="PNG")
-    png_output.seek(0)
-    return png_output
 
 def main():
     st.set_page_config(
@@ -134,7 +111,6 @@ def main():
         </h2>
     """, unsafe_allow_html=True)
     
-
     # Centered flowchart toggle
     col_toggle, _, _ = st.columns([1, 1, 1])
     with col_toggle:
@@ -143,7 +119,10 @@ def main():
     if show_flowchart:
         st.graphviz_chart(display_architecture_diagram())
 
-    
+    # Initialize variables
+    resume_text = None
+    job_description = None
+    original_file = None
 
     # Side-by-side inputs with equal width
     col1, col2 = st.columns(2)
@@ -159,16 +138,6 @@ def main():
         if uploaded_file is not None:
             resume_text = docx2txt.process(uploaded_file)
             original_file = uploaded_file
-            # Convert the uploaded DOCX file to PDF
-            #pdf_file = convert_docx_to_pdf(uploaded_file)
-            #st.write("PDF created from DOCX.")
-
-            # Convert the PDF to PNG
-            #png_file = convert_pdf_to_png(pdf_file)
-            #st.write("PNG created from PDF.")
-
-            # Show the PNG image in Streamlit
-            #st.image(png_file, caption="Converted PNG Image")
 
     with col2:
         st.markdown("##### Job Description")
@@ -178,6 +147,7 @@ def main():
             height=220,
             label_visibility="collapsed"
         )
+
     # Centered API key input first
     key = st.text_input(
             "GROQ API Key",
@@ -199,83 +169,90 @@ def main():
             process_enhance = col_b3.button("Enhance Resume")
 
         if any([process_quick, process_deep, process_enhance]):
-            if resume_text and job_description:
-                with st.spinner("Processing your resume..."):
-                    if process_quick:
-                        analysis = quick_analyze_resume(client, resume_text, job_description)
-                        st.markdown("### Quick Analysis Results")
-                        st.markdown(analysis)
-                    
-                    elif process_deep:
-                        analysis = in_depth_analyze_resume(client, resume_text, job_description)
-                        st.markdown("### Detailed Analysis")
-                        st.markdown(analysis)
-                    
-                    else:  # Enhance Resume
-                        analysis = in_depth_analyze_resume(client, resume_text, job_description)
-                        enhanced_resume = enhance_resume(client, analysis, resume_text)
-                        formatted_html = generate_formatted_resume_html(client, enhanced_resume)
-
-                        # Results tabs
-                        tab1, tab2, tab3 = st.tabs([
-                            "Enhanced Resume",
-                            "Compare Changes",
-                            "Download Options"
-                        ])
-                        
-                        with tab1:
-                            # Single HTML component for the enhanced resume
-                            st.components.v1.html(
-                                f"""
-                                <div class="resume-html">
-                                    {formatted_html}
-                                </div>
-                                """,
-                                height=800,
-                                scrolling=True
-                            )
-                        
-                        with tab2:
-                            st.components.v1.html(
-                                show_diff(resume_text, enhanced_resume),
-                                height=600,
-                                scrolling=True
-                            )
-                        
-                        with tab3:
-                            col1, col2, col3 = st.columns(3)
-                            with col1:
-                                if original_file:
-                                    updated_docx = update_docx(original_file, enhanced_resume)
-                                else:
-                                    updated_docx = BytesIO()
-                                    doc = docx.Document()
-                                    doc.add_paragraph(enhanced_resume)
-                                    doc.save(updated_docx)
-                                    updated_docx.seek(0)
-                                    
-                                st.download_button(
-                                    "📄 Download DOCX",
-                                    data=updated_docx,
-                                    file_name="enhanced_resume.docx",
-                                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                )
-                            with col2:
-                                st.download_button(
-                                    "🌐 Download HTML",
-                                    data=formatted_html,
-                                    file_name="enhanced_resume.html",
-                                    mime="text/html"
-                                )
-                            with col3:
-                                st.download_button(
-                                    "📝 Download TXT",
-                                    data=enhanced_resume,
-                                    file_name="enhanced_resume.txt",
-                                    mime="text/plain"
-                                )
+            if not resume_text:
+                st.error("Please upload your resume.")
+            elif not job_description:
+                st.error("Please provide the job description.")
             else:
-                st.error("Please provide both resume and job description.")
+                try:
+                    with st.spinner("Processing your resume..."):
+                        if process_quick:
+                            analysis = quick_analyze_resume(client, resume_text, job_description)
+                            st.markdown("### Quick Analysis Results")
+                            st.markdown(analysis)
+                        
+                        elif process_deep:
+                            analysis = in_depth_analyze_resume(client, resume_text, job_description)
+                            st.markdown("### Detailed Analysis")
+                            st.markdown(analysis)
+                        
+                        else:  # Enhance Resume
+                            analysis = in_depth_analyze_resume(client, resume_text, job_description)
+                            enhanced_resume = enhance_resume(client, analysis, resume_text)
+                            formatted_html = generate_formatted_resume_html(client, enhanced_resume)
+
+                            # Results tabs
+                            tab1, tab2, tab3 = st.tabs([
+                                "Enhanced Resume",
+                                "Compare Changes",
+                                "Download Options"
+                            ])
+                            
+                            with tab1:
+                                # Single HTML component for the enhanced resume
+                                st.components.v1.html(
+                                    f"""
+                                    <div class="resume-html">
+                                        {formatted_html}
+                                    </div>
+                                    """,
+                                    height=800,
+                                    scrolling=True
+                                )
+                            
+                            with tab2:
+                                st.components.v1.html(
+                                    show_diff(resume_text, enhanced_resume),
+                                    height=600,
+                                    scrolling=True
+                                )
+                            
+                            with tab3:
+                                col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    if original_file:
+                                        updated_docx = update_docx(original_file, enhanced_resume)
+                                    else:
+                                        updated_docx = BytesIO()
+                                        doc = docx.Document()
+                                        doc.add_paragraph(enhanced_resume)
+                                        doc.save(updated_docx)
+                                        updated_docx.seek(0)
+                                        
+                                    st.download_button(
+                                        "📄 Download DOCX",
+                                        data=updated_docx,
+                                        file_name="enhanced_resume.docx",
+                                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                    )
+                                with col2:
+                                    st.download_button(
+                                        "🌐 Download HTML",
+                                        data=formatted_html,
+                                        file_name="enhanced_resume.html",
+                                        mime="text/html"
+                                    )
+                                with col3:
+                                    st.download_button(
+                                        "📝 Download TXT",
+                                        data=enhanced_resume,
+                                        file_name="enhanced_resume.txt",
+                                        mime="text/plain"
+                                    )
+                except groq.RateLimitError as e:
+                    st.error("API rate limit exceeded. Please try again later or use a different API key.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
     else:
         st.info("👆 Please enter your GROQ API key to get started.")
 
